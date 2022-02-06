@@ -3,5 +3,6 @@ members = [
   "font-build-tool",
   "font-sarasa-gothic",
   "font-zpix",
+  "glyph-mapping",
   "examples"
 ]

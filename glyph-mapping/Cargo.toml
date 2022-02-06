@@ -1,0 +1,13 @@
+[package]
+name                    = "embedded-graphics-cjk-glyph-mapping"
+version                 = "0.1.0"
+authors                 = ["Ferris Tseng <ferristseng@fastmail.fm>"]
+edition                 = "2021"
+repository              = ""
+
+[dependencies]
+embedded-graphics       = "0.7"
+
+[dev-dependencies.embedded-graphics-cjk-font-build-tool]
+version                 = "0.1"
+path                    = "../font-build-tool"
