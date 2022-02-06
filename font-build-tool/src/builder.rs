@@ -3,21 +3,21 @@ use fontdue::Font;
 use image::{EncodableLayout, ImageBuffer, ImageResult, Luma, PixelWithColorType};
 use std::{cmp::max, fmt::Display, fs, io, ops::Deref, path::Path};
 
-// The number of glyphs to include on a single line in the final bitmap.
+/// The number of glyphs to include on a single line in the final bitmap.
 const ROW_SIZE: usize = 32;
 
 pub struct MonoFontBuilder<'a, I: Iterator<Item = char>> {
     pub font: &'a Font,
 
-    // The target font size.
+    /// The target font size.
     pub font_size: u32,
 
-    // The characters to generate bitmaps for.
+    /// The characters to generate bitmaps for.
     pub chars: I,
 
-    // Threshold for when to select a pixel when adding it to the bitmap.
-    // A reasonable value for this would be 128, meaning anything above 50%
-    // intensity will appear in the final bitmap (max threshold = 255).
+    /// Threshold for when to select a pixel when adding it to the bitmap.
+    /// A reasonable value for this would be 128, meaning anything above 50%
+    /// intensity will appear in the final bitmap (max threshold = 255).
     pub intensity_threshold: u8,
 }
 
@@ -47,11 +47,13 @@ where
             )
             .expect("expected at least one character");
 
+        // Image buffer that contains every glyph specified in rows of ROW_SIZE.
         let mut imgbuf = image::GrayImage::new(
             (max_glyph_width * ROW_SIZE) as u32,
             (max_glyph_height * ((chars.len() - 1) / ROW_SIZE + 1)) as u32,
         );
 
+        // Rasterizes the font, and copies the bitmap onto the image buffer.
         for (index, chr) in chars.iter().enumerate() {
             let (metrics, bitmap) = self.font.rasterize(*chr, self.font_size as f32);
 
@@ -94,6 +96,12 @@ pub struct MonoFontData<C> {
 }
 
 impl<C> MonoFontData<C> {
+    /// Writes the Rust source code that enables the generated font data to be
+    /// used with embedded-graphics.
+    ///
+    /// This generates a single Rust source code file, with a single constant
+    /// named `FONT`. `FONT` can then be imported in `lib.rs` and re-exported
+    /// with the desired name.
     pub fn save_rust_source<P0, P1>(
         &self,
         rust_source_path: P0,
@@ -145,6 +153,8 @@ where
     [Pxl::Subpixel]: EncodableLayout,
     Container: Deref<Target = [Pxl::Subpixel]>,
 {
+    /// Saves the image data as a PNG for debugging. This data isn't included
+    /// in the library.
     pub fn save_png<P>(&self, png_file: P) -> ImageResult<()>
     where
         P: AsRef<Path>,
@@ -157,7 +167,11 @@ impl<C> MonoFontData<C>
 where
     C: Deref<Target = [u8]>,
 {
-    // 1-Bit Per Pixel
+    /// Mono font expects the image data to be in a BPP (1-Bit Per Pixel) format.
+    /// This function will iterate collapse every 8 bytes (0 or 255) into a
+    /// single byte, where each bit corresponds to a pixel's on/off state.
+    ///
+    /// See: https://docs.rs/embedded-graphics/0.7.1/embedded_graphics/image/struct.ImageRaw.html#draw-a-1bpp-image
     pub fn save_raw<P>(&self, raw_file: P) -> io::Result<()>
     where
         P: AsRef<Path>,
