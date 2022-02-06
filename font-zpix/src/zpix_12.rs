@@ -1,18 +1,24 @@
 use embedded_graphics::{
     geometry::Size,
     image::ImageRaw,
-    mono_font::{mapping::StrGlyphMapping, DecorationDimensions, MonoFont},
+    mono_font::{DecorationDimensions, MonoFont},
 };
+use embedded_graphics_cjk_glyph_mapping::RangeGlyphMapping;
 
-const GLYPH_MAPPING: StrGlyphMapping =
-    StrGlyphMapping::new("?\0\u{2e80}\u{2ef3}\0\u{4E00}\u{9FEF}", 0);
-
+#[rustfmt::skip]
 pub const FONT: MonoFont = MonoFont {
     image: ImageRaw::new_binary(
         include_bytes!("data/zpix-12.bin"),
         32 * 12,
     ),
-    glyph_mapping: &GLYPH_MAPPING,
+    glyph_mapping: &RangeGlyphMapping::new_unchecked(
+        [
+            '?'..='?',                      // ?
+            '\u{2E80}'..='\u{2EF3}',    // CJK Radicals Supplement
+            '\u{4E00}'..='\u{9FFF}',    // CJK Unified Ideographs
+        ],
+        0
+    ),
     character_size: Size::new(12, 12),
     character_spacing: 0,
     baseline: 0,

@@ -6,18 +6,11 @@ use std::fs;
 
 const VERSION: &str = "0.35.8";
 
-const FONTS: &[(&str, u32)] = &[
-    ("sarasa-mono-sc-light", 24),
-    ("sarasa-mono-slab-sc-light", 24),
-];
+const FONTS: &[(&str, u32)] = &[("sarasa-mono-sc-light", 24), ("sarasa-mono-sc-light", 36)];
 
 fn main() -> Result<(), BuildError> {
     println!(
         "cargo:rerun-if-changed=target/font/sarasa-gothic-ttf-{}/sarasa-mono-sc-light.ttf",
-        VERSION
-    );
-    println!(
-        "cargo:rerun-if-changed=target/font/sarasa-gothic-ttf-{}/sarasa-mono-slab-sc-light.ttf",
         VERSION
     );
 
