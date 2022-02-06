@@ -4,7 +4,7 @@ WIP
 
 ## Inspired By
 
-I reference code from [wezm/profont](https://github.com/wezm/profont) and [embedded-graphics/embedded-graphics](https://github.com/embedded-graphics/embedded-graphics) pretty heavily to make this as I am not a font expert.
+I referenced code from [wezm/profont](https://github.com/wezm/profont) and [embedded-graphics/embedded-graphics](https://github.com/embedded-graphics/embedded-graphics) pretty heavily to make this as I am not a font expert.
 
 ## License
 
