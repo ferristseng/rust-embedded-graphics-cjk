@@ -1,0 +1,18 @@
+[package]
+name                        = "embedded-graphics-cjk-examples"
+version                     = "0.1.0"
+authors                     = ["Ferris Tseng <ferristseng@fastmail.fm>"]
+edition                     = "2021"
+repository                  = ""
+
+[dev-dependencies]
+embedded-graphics           = "0.7"
+embedded-graphics-simulator = "0.3"
+
+[dev-dependencies.embedded-graphics-cjk-sarasa-gothic]
+version                     = "0.1"
+path                        = "../font-sarasa-gothic"
+
+[dev-dependencies.embedded-graphics-cjk-zpix]
+version                     = "0.1"
+path                        = "../font-zpix"

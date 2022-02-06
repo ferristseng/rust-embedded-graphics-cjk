@@ -1,0 +1,17 @@
+[package]
+name                    = "embedded-graphics-cjk-sarasa-gothic"
+version                 = "0.1.0"
+authors                 = ["Ferris Tseng <ferristseng@fastmail.fm>"]
+edition                 = "2021"
+repository              = ""
+build                   = "build.rs"
+
+[dependencies]
+embedded-graphics       = "0.7"
+
+[build-dependencies]
+fontdue                 = "0.6"
+
+[build-dependencies.embedded-graphics-cjk-font-build-tool]
+version                 = "0.1"
+path                    = "../font-build-tool"

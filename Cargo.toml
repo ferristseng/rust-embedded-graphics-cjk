@@ -1,0 +1,7 @@
+[workspace]
+members = [
+  "font-build-tool",
+  "font-sarasa-gothic",
+  "font-zpix",
+  "examples"
+]

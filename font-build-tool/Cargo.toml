@@ -1,0 +1,11 @@
+[package]
+name                    = "embedded-graphics-cjk-font-build-tool"
+version                 = "0.1.0"
+authors                 = ["Ferris Tseng <ferristseng@fastmail.fm>"]
+edition                 = "2021"
+repository              = ""
+
+[dependencies]
+image                   = { version= "0.24", default-features = false, features = ["png"] }
+thiserror               = "1"
+fontdue                 = "0.6"
