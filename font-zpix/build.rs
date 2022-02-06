@@ -31,8 +31,8 @@ fn main() -> Result<(), BuildError> {
             font: &font,
             font_size: *font_size,
             chars: ('?'..='?')
-                .chain(CJK_RADICALS_SUPPLEMENT)
-                .chain(CJK_UNIFIED_IDEOGRAPHS_UNICODE_BLOCK),
+                .chain(CJK_RADICALS_SUPPLEMENT.range())
+                .chain(CJK_UNIFIED_IDEOGRAPHS_UNICODE_BLOCK.range()),
             intensity_threshold: 0,
         };
 
