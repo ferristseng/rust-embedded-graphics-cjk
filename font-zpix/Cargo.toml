@@ -1,5 +1,5 @@
 [package]
-name                    = "embedded-graphics-cjk-zpix"
+name                    = "embedded-graphics-cjk-font-zpix"
 version                 = "0.1.0"
 authors                 = ["Ferris Tseng <ferristseng@fastmail.fm>"]
 edition                 = "2021"
@@ -8,6 +8,10 @@ build                   = "build.rs"
 
 [dependencies]
 embedded-graphics       = "0.7"
+
+[dependencies.embedded-graphics-cjk-glyph-mapping]
+version                 = "0.1"
+path                    = "../glyph-mapping"
 
 [build-dependencies]
 fontdue                 = "0.6"

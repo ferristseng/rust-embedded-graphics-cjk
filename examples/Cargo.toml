@@ -9,10 +9,10 @@ repository                  = ""
 embedded-graphics           = "0.7"
 embedded-graphics-simulator = "0.3"
 
-[dev-dependencies.embedded-graphics-cjk-sarasa-gothic]
+[dev-dependencies.embedded-graphics-cjk-font-sarasa-gothic]
 version                     = "0.1"
 path                        = "../font-sarasa-gothic"
 
-[dev-dependencies.embedded-graphics-cjk-zpix]
+[dev-dependencies.embedded-graphics-cjk-font-zpix]
 version                     = "0.1"
 path                        = "../font-zpix"
