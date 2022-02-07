@@ -10,18 +10,22 @@ I referenced code from [wezm/profont](https://github.com/wezm/profont) and [embe
 
 ### Sarasa Gothic
 
-This Font Software is licensed under the SIL Open Font License, Version 1.1.
+> This Font Software is licensed under the SIL Open Font License, Version 1.1.
 
 See: https://github.com/be5invis/Sarasa-Gothic/blob/master/LICENSE
 
+### Noto
+
+> This Font Software is licensed under the SIL Open Font License, Version 1.1.
+
+See: https://github.com/googlefonts/noto-cjk/blob/main/LICENSE
+
 ### Zpix
 
-```
-- for Commercial/Business Product (Single Product) USD $1000
-- for Commercial/Business Product (Multiple Product) Contact me solidzoro@live.com
-- for Education Product FREE
-- for Personal Product FREE
-```
+> - for Commercial/Business Product (Single Product) USD $1000
+> - for Commercial/Business Product (Multiple Product) Contact me solidzoro@live.com
+> - for Education Product FREE
+> - for Personal Product FREE
 
 See: https://github.com/SolidZORO/zpix-pixel-font
 

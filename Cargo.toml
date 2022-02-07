@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "font-build-tool",
+  "font-noto",
   "font-sarasa-gothic",
   "font-zpix",
   "glyph-mapping",

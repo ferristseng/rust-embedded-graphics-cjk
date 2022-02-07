@@ -10,7 +10,7 @@ use embedded_graphics_cjk_glyph_mapping::RangeGlyphMapping;
 #[rustfmt::skip]
 pub const FONT: MonoFont = MonoFont {
     image: ImageRaw::new_binary(
-        include_bytes!("data/sarasa-mono-sc-light-36.bin"),
+        include_bytes!("data/noto_sans_mono_cjk_sc_regular-36.bin"),
         32 * 36,
     ),
     glyph_mapping: &RangeGlyphMapping::new_unchecked(
@@ -21,9 +21,9 @@ pub const FONT: MonoFont = MonoFont {
         ],
         0
     ),
-    character_size: Size::new(36, 35),
+    character_size: Size::new(36, 37),
     character_spacing: 0,
     baseline: 0,
-    underline: DecorationDimensions::new(36, 1),
-    strikethrough: DecorationDimensions::new(17, 1),
+    underline: DecorationDimensions::new(38, 1),
+    strikethrough: DecorationDimensions::new(18, 1),
 };
