@@ -10,8 +10,7 @@ impl<const SIZE: usize> RangeGlyphMapping<SIZE> {
     /// Returns a new `RangeGlyphMapping`.
     ///
     /// `default_idx` is validated to ensure that it references a valid index.
-    pub fn new(ranges: [RangeInclusive<char>; SIZE], default_idx: usize) -> Self
-    {
+    pub fn new(ranges: [RangeInclusive<char>; SIZE], default_idx: usize) -> Self {
         let map = Self {
             ranges,
             default_idx,

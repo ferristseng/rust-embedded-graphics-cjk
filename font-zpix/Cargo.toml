@@ -13,9 +13,6 @@ embedded-graphics       = "0.7"
 version                 = "0.1"
 path                    = "../glyph-mapping"
 
-[build-dependencies]
-fontdue                 = "0.6"
-
 [build-dependencies.embedded-graphics-cjk-font-build-tool]
 version                 = "0.1"
 path                    = "../font-build-tool"

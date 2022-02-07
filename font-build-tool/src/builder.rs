@@ -6,8 +6,8 @@ use std::{cmp::max, fmt::Display, fs, io, ops::Deref, path::Path};
 /// The number of glyphs to include on a single line in the final bitmap.
 const ROW_SIZE: usize = 32;
 
-pub struct MonoFontBuilder<'a, I: Iterator<Item = char>> {
-    pub font: &'a Font,
+pub struct MonoFontBuilder<I: Iterator<Item = char>> {
+    pub font: Font,
 
     /// The target font size.
     pub font_size: u32,
@@ -21,10 +21,34 @@ pub struct MonoFontBuilder<'a, I: Iterator<Item = char>> {
     pub intensity_threshold: u8,
 }
 
-impl<'a, I> MonoFontBuilder<'a, I>
+impl<I> MonoFontBuilder<I>
 where
     I: Iterator<Item = char>,
 {
+    pub fn new<P>(
+        ttf_path: P,
+        font_size: u32,
+        chars: I,
+        intensity_threshold: u8,
+    ) -> Result<MonoFontBuilder<I>, BuildError>
+    where
+        P: AsRef<Path>,
+    {
+        let font = {
+            let ttf_file = fs::read(ttf_path)?;
+
+            Font::from_bytes(ttf_file, Default::default())
+                .map_err(|message| BuildError::ReadFontError { message })?
+        };
+
+        Ok(MonoFontBuilder {
+            font,
+            font_size,
+            chars,
+            intensity_threshold,
+        })
+    }
+
     pub fn build(self) -> Result<MonoFontData<ImageBuffer<Luma<u8>, Vec<u8>>>, BuildError> {
         let chars = self.chars.collect::<Vec<_>>();
 
@@ -114,7 +138,9 @@ impl<C> MonoFontData<C> {
         // TODO: Make this better
         #[rustfmt::skip]
         let source = format!(
-r#"use embedded_graphics::{{
+r#"// This is generated code. Any modifications to this file will
+// be overwritten.
+use embedded_graphics::{{
     geometry::Size,
     image::ImageRaw,
     mono_font::{{DecorationDimensions, MonoFont}},
@@ -166,6 +192,28 @@ where
         P: AsRef<Path>,
     {
         self.data.save(png_file)
+    }
+}
+
+impl MonoFontData<ImageBuffer<Luma<u8>, Vec<u8>>> {
+    /// Saves a PNG, BPP binary file, and generated Rust source code file to
+    /// directories that make sense for all of the fonts supported by the
+    /// `embedded-graphics-cjk` project.
+    pub fn save_all_with_default_paths(
+        self,
+        font_name: &str,
+        font_size: u32,
+    ) -> Result<(), BuildError> {
+        let bin_data_name = format!("{}-{}.bin", font_name, font_size);
+
+        self.save_png(format!("png/{}-{}.png", font_name, font_size))?;
+        self.save_raw(format!("src/data/{}", bin_data_name))?;
+        self.save_rust_source(
+            format!("src/{}_{}.rs", font_name.replace('-', "_"), font_size),
+            format!("data/{}", bin_data_name),
+        )?;
+
+        Ok(())
     }
 }
 

@@ -1,3 +1,5 @@
+// This is generated code. Any modifications to this file will
+// be overwritten.
 use embedded_graphics::{
     geometry::Size,
     image::ImageRaw,
