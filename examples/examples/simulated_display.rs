@@ -1,8 +1,9 @@
 use embedded_graphics::{
     mono_font::MonoTextStyle, pixelcolor::BinaryColor, prelude::*, text::Text,
 };
+use embedded_graphics_cjk_font_noto::NOTO_SANS_MONO_CJK_SC_REGULAR_24;
 use embedded_graphics_cjk_font_sarasa_gothic::SARASA_MONO_SC_LIGHT_24;
-use embedded_graphics_cjk_font_zpix::{ZPIX_12, ZPIX_24};
+use embedded_graphics_cjk_font_zpix::ZPIX_24;
 use embedded_graphics_simulator::{
     BinaryColorTheme, OutputSettingsBuilder, SimulatorDisplay, Window,
 };
@@ -19,7 +20,7 @@ fn main() -> Result<(), core::convert::Infallible> {
     Text::new(
         "大沼澤地國家公園",
         Point::new(0, 24),
-        MonoTextStyle::new(&ZPIX_12, BinaryColor::On),
+        MonoTextStyle::new(&NOTO_SANS_MONO_CJK_SC_REGULAR_24, BinaryColor::On),
     )
     .draw(&mut display)?;
     Text::new(

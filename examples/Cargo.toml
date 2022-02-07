@@ -13,6 +13,10 @@ embedded-graphics-simulator = "0.3"
 version                     = "0.1"
 path                        = "../font-sarasa-gothic"
 
+[dev-dependencies.embedded-graphics-cjk-font-noto]
+version                     = "0.1"
+path                        = "../font-noto"
+
 [dev-dependencies.embedded-graphics-cjk-font-zpix]
 version                     = "0.1"
 path                        = "../font-zpix"
