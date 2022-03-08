@@ -1,4 +1,4 @@
-use crate::error::BuildError;
+use crate::{error::BuildError, unicode::UnicodeCodeBlock};
 use fontdue::Font;
 use image::{EncodableLayout, ImageBuffer, ImageResult, Luma, PixelWithColorType};
 use std::{cmp::max, fmt::Display, fs, io, ops::Deref, path::Path};
@@ -6,14 +6,9 @@ use std::{cmp::max, fmt::Display, fs, io, ops::Deref, path::Path};
 /// The number of glyphs to include on a single line in the final bitmap.
 const ROW_SIZE: usize = 32;
 
-pub struct MonoFontBuilder<I: Iterator<Item = char>> {
-    pub font: Font,
-
+pub struct FontOutputSettings {
     /// The target font size.
     pub font_size: u32,
-
-    /// The characters to generate bitmaps for.
-    pub chars: I,
 
     /// Threshold for when to select a pixel when adding it to the bitmap.
     /// A reasonable value for this would be 128, meaning anything above 50%
@@ -21,16 +16,18 @@ pub struct MonoFontBuilder<I: Iterator<Item = char>> {
     pub intensity_threshold: u8,
 }
 
-impl<I> MonoFontBuilder<I>
-where
-    I: Iterator<Item = char>,
-{
+pub struct MonoFontBuilder<'a> {
+    font: Font,
+
+    /// The unicode character blocks to generate bitmaps for.
+    unicode_blocks: &'a [UnicodeCodeBlock],
+}
+
+impl<'a> MonoFontBuilder<'a> {
     pub fn new<P>(
         ttf_path: P,
-        font_size: u32,
-        chars: I,
-        intensity_threshold: u8,
-    ) -> Result<MonoFontBuilder<I>, BuildError>
+        unicode_blocks: &'a [UnicodeCodeBlock],
+    ) -> Result<MonoFontBuilder<'a>, BuildError>
     where
         P: AsRef<Path>,
     {
@@ -43,21 +40,36 @@ where
 
         Ok(MonoFontBuilder {
             font,
-            font_size,
-            chars,
-            intensity_threshold,
+            unicode_blocks,
         })
     }
 
-    pub fn build(self) -> Result<MonoFontData<ImageBuffer<Luma<u8>, Vec<u8>>>, BuildError> {
-        let chars = self.chars.collect::<Vec<_>>();
+    /// Returns an iterator over characters in each unicode code block.
+    fn chars_iter(&self) -> impl Iterator<Item = char> + 'a {
+        self.unicode_blocks.iter().flat_map(|block| block.range())
+    }
 
+    /// Number of characters covered by all code blocks.
+    fn num_chars(&self) -> usize {
+        self.unicode_blocks
+            .iter()
+            .map(UnicodeCodeBlock::block_size)
+            .sum()
+    }
+
+    /// Renders glyphs for each of the selected fonts, then stores it in a
+    /// bitmap that can be exported as PNG, BBP, or source code compatible with
+    /// the embedded-graphics library.
+    pub fn build(
+        &self,
+        settings: FontOutputSettings,
+    ) -> Result<MonoFontData<ImageBuffer<Luma<u8>, Vec<u8>>>, BuildError> {
         // Determines the maximum glyph height and glyph width based on the
         // glyph metrics for each chosen character.
-        let (max_glyph_height, max_glyph_width) = chars
-            .iter()
+        let (max_glyph_height, max_glyph_width) = self
+            .chars_iter()
             .map(|chr| {
-                let metrics = self.font.metrics(*chr, self.font_size as f32);
+                let metrics = self.font.metrics(chr, settings.font_size as f32);
 
                 (metrics.height, metrics.width)
             })
@@ -74,12 +86,12 @@ where
         // Image buffer that contains every glyph specified in rows of ROW_SIZE.
         let mut imgbuf = image::GrayImage::new(
             (max_glyph_width * ROW_SIZE) as u32,
-            (max_glyph_height * ((chars.len() - 1) / ROW_SIZE + 1)) as u32,
+            (max_glyph_height * ((self.num_chars() - 1) / ROW_SIZE + 1)) as u32,
         );
 
         // Rasterizes the font, and copies the bitmap onto the image buffer.
-        for (index, chr) in chars.iter().enumerate() {
-            let (metrics, bitmap) = self.font.rasterize(*chr, self.font_size as f32);
+        for (index, chr) in self.chars_iter().enumerate() {
+            let (metrics, bitmap) = self.font.rasterize(chr, settings.font_size as f32);
 
             let col = index % ROW_SIZE;
             let row = index / ROW_SIZE;
@@ -94,7 +106,7 @@ where
                 for x in 0..metrics.width {
                     let val = row[x];
 
-                    if val > self.intensity_threshold {
+                    if val > settings.intensity_threshold {
                         let pixel_x = img_x + x;
                         let pixel_y = img_y + y;
                         if pixel_x > 0 && pixel_y > 0 {
@@ -166,7 +178,8 @@ pub const FONT: MonoFont = MonoFont {{
     baseline: 0,
     underline: DecorationDimensions::new({underline}, 1),
     strikethrough: DecorationDimensions::new({strikethrough}, 1),
-}};"#,
+}};
+"#,
             bin_data_path = bin_data_path,
             chars_per_row = ROW_SIZE,
             glyph_width = self.glyph_width,

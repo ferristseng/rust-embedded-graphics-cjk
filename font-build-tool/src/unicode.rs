@@ -6,8 +6,22 @@ pub struct UnicodeCodeBlock {
 }
 
 impl UnicodeCodeBlock {
-    pub fn range(&self) -> RangeInclusive<char> {
+    pub const fn new(start: char, end: char) -> UnicodeCodeBlock {
+        if end > start {
+            panic!("end of unicode block must be greater than the start");
+        }
+
+        UnicodeCodeBlock { start, end }
+    }
+
+    /// Unicode block expressed as an iterable range of characters.
+    pub const fn range(&self) -> RangeInclusive<char> {
         RangeInclusive::new(self.start, self.end)
+    }
+
+    /// Number of characters covered by the code block.
+    pub const fn block_size(&self) -> usize {
+        self.end as usize - self.start as usize
     }
 }
 

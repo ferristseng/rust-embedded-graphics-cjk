@@ -1,37 +1,48 @@
 use embedded_graphics_cjk_font_build_tool::{
-    BuildError, MonoFontBuilder, CJK_RADICALS_SUPPLEMENT, CJK_UNIFIED_IDEOGRAPHS_UNICODE_BLOCK,
+    BuildError, FontOutputSettings, MonoFontBuilder, UnicodeCodeBlock, CJK_RADICALS_SUPPLEMENT,
+    CJK_UNIFIED_IDEOGRAPHS_UNICODE_BLOCK,
 };
+use std::env;
 
 const VERSION: &str = include_str!("SARASA_VERSION");
 
 #[rustfmt::skip]
-const FONTS: &[(&str, u32)] = &[
-    ("sarasa-mono-sc-light", 24),
-    ("sarasa-mono-sc-light", 36)
+const FONTS: &[(&str, &[u32])] = &[
+    ("sarasa-mono-sc-light", &[24, 36]),
+];
+
+const UNICODE_CODE_BLOCKS: &[UnicodeCodeBlock] = &[
+    UnicodeCodeBlock::new('?', '?'),
+    CJK_RADICALS_SUPPLEMENT,
+    CJK_UNIFIED_IDEOGRAPHS_UNICODE_BLOCK,
 ];
 
 fn main() -> Result<(), BuildError> {
-    println!(
-        "cargo:rerun-if-changed=target/font/sarasa-gothic-ttf-{}/sarasa-mono-sc-light.ttf",
-        VERSION
-    );
+    println!("cargo:rerun-if-env-changed=REBUILD_FONT_DATA");
 
-    for &(font_name, font_size) in FONTS {
-        let mono_font_builder = MonoFontBuilder::new(
-            format!(
-                "target/font/sarasa-gothic-ttf-{}/{}.ttf",
-                VERSION, font_name
-            ),
-            font_size,
-            ('?'..='?')
-                .chain(CJK_RADICALS_SUPPLEMENT.range())
-                .chain(CJK_UNIFIED_IDEOGRAPHS_UNICODE_BLOCK.range()),
-            0,
-        )?;
+    let rebuild_font_data = env::var("REBUILD_FONT_DATA")
+        .map(|v| v == "1")
+        .unwrap_or(false);
 
-        mono_font_builder
-            .build()?
-            .save_all_with_default_paths(font_name, font_size)?;
+    if rebuild_font_data {
+        for &(font_name, font_sizes) in FONTS {
+            let mono_font_builder = MonoFontBuilder::new(
+                format!(
+                    "target/font/sarasa-gothic-ttf-{}/{}.ttf",
+                    VERSION, font_name
+                ),
+                UNICODE_CODE_BLOCKS,
+            )?;
+
+            for &font_size in font_sizes {
+                mono_font_builder
+                    .build(FontOutputSettings {
+                        font_size,
+                        intensity_threshold: 80,
+                    })?
+                    .save_all_with_default_paths(font_name, font_size)?;
+            }
+        }
     }
 
     Ok(())
