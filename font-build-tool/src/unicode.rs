@@ -25,6 +25,16 @@ impl UnicodeCodeBlock {
     }
 }
 
+// Code Points           : 128
+// Wiki                  : https://en.wikipedia.org/wiki/Basic_Latin_(Unicode_block)
+// Unicode Version       : 1.0.0
+// Date Updated in Crate : 2022-03-13
+// Notes                 :
+pub const BASIC_LATIN: UnicodeCodeBlock = UnicodeCodeBlock {
+    start: '\u{0000}',
+    end: '\u{007F}',
+};
+
 // Code Points           : 20992
 // Wiki                  : https://en.wikipedia.org/wiki/CJK_Unified_Ideographs_(Unicode_block)
 // Unicode Version       : 14.0
