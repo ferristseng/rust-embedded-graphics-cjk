@@ -11,7 +11,7 @@ const FONTS: &[(&str, &str, &[u32])] = &[
     (
         "NotoSansMonoCJKsc-Regular",
         "noto_sans_mono_cjk_sc_regular",
-        &[24, 36]
+        &[36]
     ),
 ];
 
