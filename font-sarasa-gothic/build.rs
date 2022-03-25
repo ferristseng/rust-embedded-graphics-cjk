@@ -8,7 +8,7 @@ const VERSION: &str = include_str!("SARASA_VERSION");
 
 #[rustfmt::skip]
 const FONTS: &[(&str, &[u32])] = &[
-    ("sarasa-mono-sc-light", &[24, 36]),
+    ("sarasa-mono-sc-light", &[36]),
 ];
 
 const UNICODE_CODE_BLOCKS: &[UnicodeCodeBlock] = &[
