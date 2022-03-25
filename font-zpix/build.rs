@@ -8,7 +8,7 @@ const VERSION: &str = include_str!("ZPIX_VERSION");
 
 #[rustfmt::skip]
 const FONTS: &[(&str, &[u32])] = &[
-    ("zpix", &[12, 24]),
+    ("zpix", &[12, 24,]),
 ];
 
 const UNICODE_CODE_BLOCKS: &[UnicodeCodeBlock] = &[
@@ -19,7 +19,7 @@ const UNICODE_CODE_BLOCKS: &[UnicodeCodeBlock] = &[
 
 fn main() -> Result<(), BuildError> {
     println!("cargo:rerun-if-env-changed=REBUILD_FONT_DATA");
-    
+
     let rebuild_font_data = env::var("REBUILD_FONT_DATA")
         .map(|v| v == "1")
         .unwrap_or(false);
