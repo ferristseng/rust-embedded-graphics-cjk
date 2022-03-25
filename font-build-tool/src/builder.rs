@@ -97,9 +97,11 @@ impl<'a> MonoFontBuilder<'a> {
             let row = index / ROW_SIZE;
             let img_x = col * max_glyph_width;
             let img_y = row * max_glyph_height;
+            let img_x_offset = metrics.xmin;
+            let img_y_offset = (max_glyph_height - metrics.height) / 2;
 
             // Copy onto image
-            for y in (0..metrics.height).rev() {
+            for y in 0..metrics.height {
                 let (row_start, row_end) = (y * metrics.width, (y + 1) * metrics.width);
 
                 let row = &bitmap[row_start..row_end];
@@ -107,8 +109,10 @@ impl<'a> MonoFontBuilder<'a> {
                     let val = row[x];
 
                     if val > settings.intensity_threshold {
-                        let pixel_x = img_x + x;
-                        let pixel_y = img_y + y;
+                        let pixel_x = (img_x + x)
+                            .checked_add_signed(img_x_offset as isize)
+                            .unwrap();
+                        let pixel_y = img_y + y + img_y_offset;
                         if pixel_x > 0 && pixel_y > 0 {
                             imgbuf.put_pixel(pixel_x as u32, pixel_y as u32, Luma([0xFF]));
                         }

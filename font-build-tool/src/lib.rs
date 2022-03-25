@@ -1,3 +1,5 @@
+#![feature(mixed_integer_ops)]
+
 mod builder;
 mod error;
 mod unicode;
