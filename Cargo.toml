@@ -1,9 +1,13 @@
 [workspace]
 members = [
   "font-build-tool",
+  "font-fusion-pixel",
   "font-noto",
   "font-sarasa-gothic",
   "font-zpix",
   "glyph-mapping",
   "examples"
 ]
+
+[patch.crates-io]
+embedded-graphics           = { path = "../embedded-graphics" }
