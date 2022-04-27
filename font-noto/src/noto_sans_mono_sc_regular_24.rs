@@ -10,7 +10,7 @@ use embedded_graphics_cjk_glyph_mapping::RangeGlyphMapping;
 #[rustfmt::skip]
 pub const FONT: MonoFont = MonoFont {
     image: ImageRaw::new_binary(
-        include_bytes!("data/fusion-pixel-24.bin"),
+        include_bytes!("data/noto_sans_mono_sc_regular-24.bin"),
         32 * 24,
     ),
     glyph_mapping: &RangeGlyphMapping::new_unchecked(

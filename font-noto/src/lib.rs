@@ -1,3 +1,7 @@
-mod noto_sans_mono_cjk_sc_regular_36;
+mod noto_sans_mono_sc_regular_24;
+mod noto_sans_mono_sc_regular_32;
+mod noto_sans_mono_sc_regular_36;
 
-pub use noto_sans_mono_cjk_sc_regular_36::FONT as NOTO_SANS_MONO_CJK_SC_REGULAR_36;
+pub use noto_sans_mono_sc_regular_24::FONT as NOTO_SANS_MONO_CJK_SC_REGULAR_24;
+pub use noto_sans_mono_sc_regular_32::FONT as NOTO_SANS_MONO_CJK_SC_REGULAR_32;
+pub use noto_sans_mono_sc_regular_36::FONT as NOTO_SANS_MONO_CJK_SC_REGULAR_36;

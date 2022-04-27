@@ -21,9 +21,9 @@ pub const FONT: MonoFont = MonoFont {
         ],
         0
     ),
-    character_size: Size::new(12, 12),
+    character_size: Size::new(12, 14),
     character_spacing: 0,
     baseline: 0,
-    underline: DecorationDimensions::new(13, 1),
-    strikethrough: DecorationDimensions::new(6, 1),
+    underline: DecorationDimensions::new(15, 1),
+    strikethrough: DecorationDimensions::new(7, 1),
 };

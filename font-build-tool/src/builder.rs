@@ -1,7 +1,7 @@
 use crate::{error::BuildError, unicode::UnicodeCodeBlock};
-use fontdue::Font;
+use freetype::{face::LoadFlag, Face, Library};
 use image::{EncodableLayout, ImageBuffer, ImageResult, Luma, PixelWithColorType};
-use std::{cmp::max, fmt::Display, fs, io, ops::Deref, path::Path};
+use std::{cmp::max, ffi::OsStr, fmt::Display, fs, io, ops::Deref, path::Path};
 
 /// The number of glyphs to include on a single line in the final bitmap.
 const ROW_SIZE: usize = 32;
@@ -17,7 +17,9 @@ pub struct FontOutputSettings {
 }
 
 pub struct MonoFontBuilder<'a> {
-    font: Font,
+    _lib: Library,
+
+    font: Face,
 
     /// The unicode character blocks to generate bitmaps for.
     unicode_blocks: &'a [UnicodeCodeBlock],
@@ -29,16 +31,13 @@ impl<'a> MonoFontBuilder<'a> {
         unicode_blocks: &'a [UnicodeCodeBlock],
     ) -> Result<MonoFontBuilder<'a>, BuildError>
     where
-        P: AsRef<Path>,
+        P: AsRef<OsStr>,
     {
-        let font = {
-            let ttf_file = fs::read(ttf_path)?;
-
-            Font::from_bytes(ttf_file, Default::default())
-                .map_err(|message| BuildError::ReadFontError { message })?
-        };
+        let lib = Library::init().unwrap();
+        let font = lib.new_face(ttf_path, 0).unwrap();
 
         Ok(MonoFontBuilder {
+            _lib: lib,
             font,
             unicode_blocks,
         })
@@ -64,14 +63,33 @@ impl<'a> MonoFontBuilder<'a> {
         &self,
         settings: FontOutputSettings,
     ) -> Result<MonoFontData<ImageBuffer<Luma<u8>, Vec<u8>>>, BuildError> {
+        println!(
+            "font.family_name={:?} font.style_name={:?}",
+            self.font.family_name(),
+            self.font.style_name()
+        );
+
+        self.font
+            .set_pixel_sizes(0, settings.font_size as u32)
+            .unwrap();
+
         // Determines the maximum glyph height and glyph width based on the
         // glyph metrics for each chosen character.
         let (max_glyph_height, max_glyph_width) = self
             .chars_iter()
             .map(|chr| {
-                let metrics = self.font.metrics(chr, settings.font_size as f32);
+                self.font.load_char(chr as usize, LoadFlag::RENDER).unwrap();
 
-                (metrics.height, metrics.width)
+                let glyph = self.font.glyph();
+                let metrics = glyph.metrics();
+                let bitmap = glyph.bitmap();
+
+                (
+                    std::cmp::max(bitmap.rows() as usize, metrics.vertAdvance as usize / 64)
+                        .checked_add_signed(bitmap.rows() as isize - glyph.bitmap_top() as isize)
+                        .unwrap(),
+                    metrics.horiAdvance as usize / 64,
+                )
             })
             .reduce(
                 |(max_glyph_height, max_glyph_width), (glyph_height, glyph_width)| {
@@ -83,6 +101,11 @@ impl<'a> MonoFontBuilder<'a> {
             )
             .expect("expected at least one character");
 
+        println!(
+            "max_glyph_height={} max_glyph_width={}",
+            max_glyph_height, max_glyph_width
+        );
+
         // Image buffer that contains every glyph specified in rows of ROW_SIZE.
         let mut imgbuf = image::GrayImage::new(
             (max_glyph_width * ROW_SIZE) as u32,
@@ -91,28 +114,51 @@ impl<'a> MonoFontBuilder<'a> {
 
         // Rasterizes the font, and copies the bitmap onto the image buffer.
         for (index, chr) in self.chars_iter().enumerate() {
-            let (metrics, bitmap) = self.font.rasterize(chr, settings.font_size as f32);
+            self.font.load_char(chr as usize, LoadFlag::RENDER).unwrap();
+
+            let glyph = self.font.glyph();
+            let metrics = glyph.metrics();
+            let bitmap = glyph.bitmap();
+
+            /*
+            println!(
+                "[{: >8}: {}] bitmap.width = {: >3} \
+                bitmap.rows = {: >3} \
+                glyph.left = {: >3} \
+                glyph.top = {: >3} \
+                glyph.v_advance = {: >3} \
+                glyph.h_advance = {: >3} \
+                bitmap.len = {: >6} \
+                bitmap.pixel_mode = {:?}",
+                index,
+                chr,
+                bitmap.width(),
+                bitmap.rows(),
+                glyph.bitmap_left(),
+                glyph.bitmap_top(),
+                metrics.vertAdvance as usize / 64,
+                metrics.horiAdvance as usize / 64,
+                bitmap.buffer().len(),
+                bitmap.pixel_mode().unwrap()
+            );
+            */
 
             let col = index % ROW_SIZE;
             let row = index / ROW_SIZE;
-            let img_x = col * max_glyph_width;
-            let img_y = row * max_glyph_height;
-            let img_x_offset = metrics.xmin;
-            let img_y_offset = (max_glyph_height - metrics.height) / 2;
+            let img_x = col as isize * max_glyph_width as isize;
+            let img_y = row as isize * max_glyph_height as isize;
+            let img_x_offset = glyph.bitmap_left() as usize;
+            let img_y_offset = (max_glyph_height - glyph.bitmap_top() as usize) / 2;
+            let cols = bitmap.width() as usize;
 
             // Copy onto image
-            for y in 0..metrics.height {
-                let (row_start, row_end) = (y * metrics.width, (y + 1) * metrics.width);
-
-                let row = &bitmap[row_start..row_end];
-                for x in 0..metrics.width {
-                    let val = row[x];
+            for y in 0..bitmap.rows() as usize {
+                for x in 0..bitmap.width() as usize {
+                    let val = bitmap.buffer()[y * cols + x];
 
                     if val > settings.intensity_threshold {
-                        let pixel_x = (img_x + x)
-                            .checked_add_signed(img_x_offset as isize)
-                            .unwrap();
-                        let pixel_y = img_y + y + img_y_offset;
+                        let pixel_x = img_x + x as isize + img_x_offset as isize;
+                        let pixel_y = img_y + y as isize + img_y_offset as isize;
                         if pixel_x > 0 && pixel_y > 0 {
                             imgbuf.put_pixel(pixel_x as u32, pixel_y as u32, Luma([0xFF]));
                         }
@@ -209,28 +255,6 @@ where
         P: AsRef<Path>,
     {
         self.data.save(png_file)
-    }
-}
-
-impl MonoFontData<ImageBuffer<Luma<u8>, Vec<u8>>> {
-    /// Saves a PNG, BPP binary file, and generated Rust source code file to
-    /// directories that make sense for all of the fonts supported by the
-    /// `embedded-graphics-cjk` project.
-    pub fn save_all_with_default_paths(
-        self,
-        font_name: &str,
-        font_size: u32,
-    ) -> Result<(), BuildError> {
-        let bin_data_name = format!("{}-{}.bin", font_name, font_size);
-
-        self.save_png(format!("png/{}-{}.png", font_name, font_size))?;
-        self.save_raw(format!("src/data/{}", bin_data_name))?;
-        self.save_rust_source(
-            format!("src/{}_{}.rs", font_name.replace('-', "_"), font_size),
-            format!("data/{}", bin_data_name),
-        )?;
-
-        Ok(())
     }
 }
 

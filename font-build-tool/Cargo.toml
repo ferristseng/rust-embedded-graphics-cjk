@@ -3,9 +3,14 @@ name                    = "embedded-graphics-cjk-font-build-tool"
 version                 = "0.1.0"
 authors                 = ["Ferris Tseng <ferristseng@fastmail.fm>"]
 edition                 = "2021"
-repository              = ""
+repository              = "https://github.com/ferristseng/rust-embedded-graphics-cjk"
+
+[[bin]]
+name                    = "ttf2bits"
+required-features       = ["clap"]
 
 [dependencies]
+clap                    = { version = "3", features = ["derive"], optional = true }
 image                   = { version= "0.24", default-features = false, features = ["png"] }
 thiserror               = "1"
-fontdue                 = "0.6"
+freetype-rs             = "0.29"

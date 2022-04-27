@@ -61,9 +61,6 @@ impl<const SIZE: usize> GlyphMapping for RangeGlyphMapping<SIZE> {
 mod tests {
     use super::RangeGlyphMapping;
     use embedded_graphics::mono_font::mapping::GlyphMapping;
-    use embedded_graphics_cjk_font_build_tool::{
-        CJK_RADICALS_SUPPLEMENT, CJK_UNIFIED_IDEOGRAPHS_UNICODE_BLOCK,
-    };
 
     #[test]
     fn test_range_one_element() {
@@ -76,7 +73,7 @@ mod tests {
     #[test]
     fn test_range_cjk_unified_ideographs() {
         let map =
-            RangeGlyphMapping::new(['?'..='?', CJK_UNIFIED_IDEOGRAPHS_UNICODE_BLOCK.range()], 0);
+            RangeGlyphMapping::new(['?'..='?', '\u{4E00}'..='\u{9FFF}'], 0);
 
         //     1: Question Mark
         // 20992: Code points in CJK Unified Ideographs
@@ -87,7 +84,7 @@ mod tests {
 
     #[test]
     fn test_range_cjk_radicals_supplement() {
-        let map = RangeGlyphMapping::new(['?'..='?', CJK_RADICALS_SUPPLEMENT.range()], 0);
+        let map = RangeGlyphMapping::new(['?'..='?', '\u{2E80}'..='\u{2EF3}'], 0);
 
         //   1: Question Mark
         // 116: Code points in CJK Radicals Supplment (incl. U+2E9A, which is
