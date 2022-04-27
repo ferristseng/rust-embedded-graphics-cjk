@@ -10,7 +10,7 @@ use embedded_graphics_simulator::{OutputSettingsBuilder, SimulatorDisplay, Windo
 const TEXT: &'static str = "大沼澤地國家公園";
 
 fn main() -> Result<(), core::convert::Infallible> {
-    let mut display = SimulatorDisplay::<BinaryColor>::new(Size::new(512, 128));
+    let mut display = SimulatorDisplay::<BinaryColor>::new(Size::new(512, 512));
 
     let width_multiplier = TEXT.chars().count() as i32 + 1;
     let lines_to_draw = &[
@@ -21,27 +21,27 @@ fn main() -> Result<(), core::convert::Infallible> {
         ),
         Text::new(
             TEXT,
-            Point::new(0, 36),
+            Point::new(0, 64),
             MonoTextStyle::new(&NOTO_SANS_MONO_CJK_SC_REGULAR_36, BinaryColor::On),
         ),
         Text::new(
             TEXT,
-            Point::new(0, 72),
+            Point::new(0, 128),
             MonoTextStyle::new(&FUSION_PIXEL_24, BinaryColor::On),
         ),
         Text::new(
             TEXT,
-            Point::new(24 * width_multiplier, 72),
+            Point::new(24 * width_multiplier, 128),
             MonoTextStyle::new(&ZPIX_24, BinaryColor::On),
         ),
         Text::new(
             TEXT,
-            Point::new(0, 96),
+            Point::new(0, 164),
             MonoTextStyle::new(&FUSION_PIXEL_12, BinaryColor::On),
         ),
         Text::new(
             TEXT,
-            Point::new(12 * width_multiplier, 96),
+            Point::new(12 * width_multiplier, 164),
             MonoTextStyle::new(&ZPIX_12, BinaryColor::On),
         ),
     ];
