@@ -24,6 +24,3 @@ path                        = "../font-noto"
 [dev-dependencies.embedded-graphics-cjk-font-zpix]
 version                     = "0.1"
 path                        = "../font-zpix"
-
-[patch.crates-io]
-embedded-graphics           = { path = "../../embedded-graphics" }
